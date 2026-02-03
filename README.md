@@ -10,6 +10,10 @@ Prerequisites:
 - Node.js (14+)
 - (Windows) PowerShell recommended
 
+Requirements:
+- PiyoLog (Android) installed to export baby-tracking logs: https://play.google.com/store/apps/details?id=jp.co.sakabou.piyolog&hl=en
+- Export PiyoLog logs as text and place them in raw-data/*.txt before parsing.
+
 Commands (from repository root):
 
 - Optional: install script dependencies
