@@ -1,0 +1,16 @@
+{
+  "name": "baby-ai-data-processing",
+  "version": "1.0.0",
+  "description": "PiyoLog baby tracking data parser and analyzer",
+  "main": "parse-logs.js",
+  "scripts": {
+    "parse": "node parse-logs.js",
+    "query": "node query-logs.js",
+    "export": "node export-data.js",
+    "timeline": "node generate-timeline.js",
+    "process": "npm run parse && npm run export && npm run timeline"
+  },
+  "keywords": ["baby", "tracking", "piyolog", "parser"],
+  "author": "",
+  "license": "MIT"
+}
