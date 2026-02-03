@@ -28,7 +28,8 @@ What you get
 - data/all-entries.json — parsed daily entries
 - data/timeline.html — interactive dashboard (open in browser)
 - data/baby-log-data.csv / .html / .md — exported tables
-- [VIDEO_PLACEHOLDER] Upload the demo video as a repository attachment and name it baby-progress-ai.mp4 if you want scripts or docs to reference it
+
+https://github.com/user-attachments/assets/b9bdf017-1804-48ba-8586-f46b314bebf6
 
 More details
 - For per-script options and examples see: ./scripts/README.md
