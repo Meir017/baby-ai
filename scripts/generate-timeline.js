@@ -23,7 +23,8 @@ class TimelineGenerator {
       let bfLeft = 0, bfRight = 0, formulaMl = 0, formulaTimes = 0;
       let ebmMl = 0, ebmTimes = 0, pumpingMl = 0;
       let sleepMinutes = 0, peeCount = 0, poopCount = 0;
-      let weight = null, temperature = null;
+      let weight = null, temperature = null, mealCount = 0;
+      let mealDetails = [];
 
       for (const event of entry.events) {
         switch(event.type) {
@@ -41,6 +42,10 @@ class TimelineGenerator {
             break;
           case 'pumping':
             pumpingMl += event.amount || 0;
+            break;
+          case 'meal':
+            mealCount++;
+            if (event.description) mealDetails.push(event.description);
             break;
           case 'sleep':
             if (event.duration) {
@@ -86,6 +91,8 @@ class TimelineGenerator {
         sleepMinutes: sleepMinutes,
         peeCount: peeCount,
         poopCount: poopCount,
+        mealCount: mealCount,
+        mealDetails: mealDetails,
         weight: weight,
         temperature: temperature
       });
@@ -110,6 +117,8 @@ class TimelineGenerator {
     const sleepData = timeline.map(d => (d.sleepMinutes / 60).toFixed(1));
     const peeData = timeline.map(d => d.peeCount);
     const poopData = timeline.map(d => d.poopCount);
+    const mealData = timeline.map(d => d.mealCount);
+    const mealDetailsData = timeline.map(d => d.mealDetails);
 
     // Filter weight and temp data (sparse)
     const weightDates = timeline.filter(d => d.weight).map(d => d.date);
@@ -324,6 +333,16 @@ class TimelineGenerator {
       <div class="chart-title">🌡️ Body Temperature</div>
       <div class="chart-container">
         <canvas id="tempChart"></canvas>
+      </div>
+    </div>
+    ` : ''}
+
+    <!-- Meal Timeline -->
+    ${mealData.some(m => m > 0) ? `
+    <div class="chart-section">
+      <div class="chart-title">🥕 Solid Food (Meals)</div>
+      <div class="chart-container">
+        <canvas id="mealChart"></canvas>
       </div>
     </div>
     ` : ''}
@@ -558,6 +577,39 @@ class TimelineGenerator {
       }
     });
     ` : ''}
+
+    // Meal Chart
+    if (document.getElementById('mealChart')) {
+      const mealDetailsData = ${JSON.stringify(mealDetailsData)};
+      new Chart(document.getElementById('mealChart'), {
+        type: 'bar',
+        data: {
+          labels: ${JSON.stringify(dates.map((d, i) => i % 7 === 0 ? d : ''))},
+          datasets: [{
+            label: 'Meals per Day',
+            data: ${JSON.stringify(mealData)},
+            backgroundColor: '#FF9800',
+            borderColor: '#F57C00',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          ...chartDefaults,
+          plugins: {
+            ...chartDefaults.plugins,
+            tooltip: {
+              callbacks: {
+                afterBody: (context) => {
+                  const index = context[0].dataIndex;
+                  const details = mealDetailsData[index];
+                  return details && details.length > 0 ? 'Details:\\n- ' + details.join('\\n- ') : '';
+                }
+              }
+            }
+          }
+        }
+      });
+    }
   </script>
 </body>
 </html>`;
@@ -632,6 +684,11 @@ class TimelineGenerator {
         avgPoopPerDay: (timeline.reduce((s, d) => s + d.poopCount, 0) / this.entries.length).toFixed(1),
         totalPee: timeline.reduce((s, d) => s + d.peeCount, 0),
         totalPoop: timeline.reduce((s, d) => s + d.poopCount, 0)
+      },
+      meals: {
+        totalMeals: timeline.reduce((s, d) => s + d.mealCount, 0),
+        avgMealsPerDay: (timeline.reduce((s, d) => s + d.mealCount, 0) / this.entries.length).toFixed(1),
+        daysWithMeals: timeline.filter(d => d.mealCount > 0).length
       },
       measurements: weightData.length > 0 ? {
         weight: {

@@ -21,7 +21,7 @@ class DataExporter {
       'Formula (times)', 'Formula (ml)',
       'Expressed Milk (times)', 'Expressed Milk (ml)',
       'Pumping (ml)', 'Sleep (hours)', 'Sleep (minutes)',
-      'Pee (times)', 'Poop (times)'
+      'Pee (times)', 'Poop (times)', 'Meals (count)'
     ];
 
     const rows = [headers.join(',')];
@@ -45,7 +45,8 @@ class DataExporter {
         summary.sleep?.hours || 0,
         summary.sleep?.minutes || 0,
         summary.pee || 0,
-        summary.poop || 0
+        summary.poop || 0,
+        summary.meals || 0
       ];
 
       rows.push(row.map(v => `"${v}"`).join(','));
@@ -99,6 +100,7 @@ class DataExporter {
           <th>EBM</th>
           <th>Sleep</th>
           <th>Pee/Poop</th>
+          <th>Meals</th>
         </tr>
       </thead>
       <tbody>`;
@@ -114,6 +116,8 @@ class DataExporter {
       const sleepStr = summary.sleep ? 
         `${summary.sleep.hours}h ${summary.sleep.minutes}m` : '-';
       const peePoopStr = `${summary.pee || 0}/${summary.poop || 0}`;
+      const mealStr = summary.mealDetails && summary.mealDetails.length > 0 ? 
+        summary.mealDetails.join(', ') : (summary.meals || '-');
       const age = `${entry.age.months}m ${entry.age.days}d`;
 
       html += `
@@ -127,6 +131,7 @@ class DataExporter {
           <td>${ebmStr}</td>
           <td>${sleepStr}</td>
           <td>${peePoopStr}</td>
+          <td>${mealStr}</td>
         </tr>`;
     }
 
@@ -151,8 +156,8 @@ class DataExporter {
     md += `- Range: ${this.entries[0]?.date} to ${this.entries[this.entries.length - 1]?.date}\n\n`;
 
     md += `## Daily Summary\n\n`;
-    md += `| Date | Day | Age | BF L/R | Formula | EBM | Sleep | Pee/Poop |\n`;
-    md += `|------|-----|-----|--------|---------|-----|-------|----------|\n`;
+    md += `| Date | Day | Age | BF L/R | Formula | EBM | Sleep | Pee/Poop | Meals |\n`;
+    md += `|------|-----|-----|--------|---------|-----|-------|----------|-------|\n`;
 
     for (const entry of this.entries) {
       const summary = entry.summary;
@@ -165,9 +170,11 @@ class DataExporter {
       const sleepStr = summary.sleep ? 
         `${summary.sleep.hours}h${summary.sleep.minutes}m` : '-';
       const peePoopStr = `${summary.pee || 0}/${summary.poop || 0}`;
+      const mealStr = summary.mealDetails && summary.mealDetails.length > 0 ? 
+        summary.mealDetails.join(', ') : (summary.meals || '0');
       const age = `${entry.age.months}m${entry.age.days}d`;
 
-      md += `| ${entry.date} | ${entry.dayOfWeek} | ${age} | ${bfStr} | ${formulaStr} | ${ebmStr} | ${sleepStr} | ${peePoopStr} |\n`;
+      md += `| ${entry.date} | ${entry.dayOfWeek} | ${age} | ${bfStr} | ${formulaStr} | ${ebmStr} | ${sleepStr} | ${peePoopStr} | ${mealStr} |\n`;
     }
 
     fs.writeFileSync(outputPath, md);

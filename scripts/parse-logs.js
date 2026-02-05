@@ -40,12 +40,20 @@ class PiyoLogParser {
       if (dayMatch) {
         // Save previous day if exists
         if (currentDay) {
+          const events = currentEvents;
+          const summary = this.extractDaySummary(lines, i);
+          
+          // Add manually calculated summaries for types not in raw summary
+          const mealEvents = events.filter(e => e.type === 'meal');
+          summary.meals = mealEvents.length;
+          summary.mealDetails = mealEvents.map(e => e.description).filter(Boolean);
+
           entries.push({
             date: this.formatDate(currentDay),
             dayOfWeek: currentDay.dayOfWeek,
             age: currentDay.age,
-            events: currentEvents,
-            summary: this.extractDaySummary(lines, i)
+            events: events,
+            summary: summary
           });
         }
 
@@ -80,12 +88,17 @@ class PiyoLogParser {
 
     // Don't forget the last entry
     if (currentDay) {
+      const summary = this.extractDaySummary(lines, lines.length);
+      const mealEvents = currentEvents.filter(e => e.type === 'meal');
+      summary.meals = mealEvents.length;
+      summary.mealDetails = mealEvents.map(e => e.description).filter(Boolean);
+
       entries.push({
         date: this.formatDate(currentDay),
         dayOfWeek: currentDay.dayOfWeek,
         age: currentDay.age,
         events: currentEvents,
-        summary: this.extractDaySummary(lines, lines.length)
+        summary: summary
       });
     }
 
@@ -314,10 +327,20 @@ class PiyoLogParser {
       };
     }
 
+    // Meal / Solids
+    const mealMatch = cleanDesc.match(/Meal\s+(.+)$|Meal\b/i);
+    if (mealMatch) {
+      return {
+        time,
+        type: 'meal',
+        description: mealMatch[1] ? mealMatch[1].trim() : 'Meal'
+      };
+    }
+
     // If we can't parse it, log it for debugging
     if (cleanDesc && !cleanDesc.match(/^[א-ת]/) && cleanDesc.length > 0) {
       // Only log non-Hebrew, non-empty unparsed events
-      if (!cleanDesc.match(/Breastfeeding|Formula|Expressed|Pumping|Sleep|Wake|Pee|Poop|Bath|Walk|טיול|Physio|Temp|Weight|Height|Head|Vaccine|Medicine/i)) {
+      if (!cleanDesc.match(/Breastfeeding|Formula|Expressed|Pumping|Sleep|Wake|Pee|Poop|Bath|Walk|טיול|Physio|Temp|Weight|Height|Head|Vaccine|Medicine|Meal/i)) {
         // console.log(`Unparsed event: [${time}] ${description}`);
       }
     }
@@ -391,6 +414,12 @@ class PiyoLogParser {
       const poopMatch = line.match(/Poop\s+(\d+)times/);
       if (poopMatch) {
         summary.poop = parseInt(poopMatch[1]);
+      }
+
+      // Meal
+      const mealMatch = line.match(/Meal\s+(\d+)times/);
+      if (mealMatch) {
+         summary.meals = parseInt(mealMatch[1]);
       }
     }
     return summary;
