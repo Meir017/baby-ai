@@ -118,7 +118,9 @@ class PiyoLogParser {
    */
   extractAgeFromNextLine(lines, currentIndex) {
     for (let i = currentIndex + 1; i < Math.min(currentIndex + 3, lines.length); i++) {
-      const match = lines[i].match(/\((\d+)m\s+(\d+)d\s+old\)/);
+      // Handle both formats: "(0m 0d old)" and "(7 mo 12 d)"
+      const match = lines[i].match(/\((\d+)\s*m\s+(\d+)\s*d\s+old\)/) ||
+                    lines[i].match(/\((\d+)\s*mo\s+(\d+)\s*d\)/);
       if (match) {
         return {
           months: parseInt(match[1]),
@@ -277,13 +279,21 @@ class PiyoLogParser {
       };
     }
 
-    // Weight
-    const weightMatch = cleanDesc.match(/Weight\s+([\d.]+)\s*kg/i);
-    if (weightMatch) {
+    // Weight (supports both kg and g)
+    const weightKgMatch = cleanDesc.match(/Weight\s+([\d.]+)\s*kg/i);
+    const weightGMatch = cleanDesc.match(/Weight\s+(\d+)\s*g\b/i);
+    if (weightKgMatch) {
       return {
         time,
         type: 'weight',
-        kg: parseFloat(weightMatch[1])
+        kg: parseFloat(weightKgMatch[1])
+      };
+    }
+    if (weightGMatch) {
+      return {
+        time,
+        type: 'weight',
+        kg: parseInt(weightGMatch[1]) / 1000
       };
     }
 

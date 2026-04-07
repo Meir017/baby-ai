@@ -8,7 +8,10 @@
     "query": "node query-logs.js",
     "export": "node export-data.js",
     "timeline": "node generate-timeline.js",
-    "process": "npm run parse && npm run export && npm run timeline"
+    "categorize": "node categorize-data.js",
+    "patterns": "node find-patterns.js",
+    "report": "node generate-report.js",
+    "analyze": "npm run parse && npm run categorize && npm run patterns && npm run report"
   },
   "keywords": ["baby", "tracking", "piyolog", "parser"],
   "author": "",
