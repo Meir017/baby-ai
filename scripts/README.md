@@ -166,7 +166,7 @@ npm run export
 npm run timeline
 
 # Or do all in one command
-npm run process
+npm run export && npm run timeline
 ```
 
 **Then open `data/timeline.html` in your browser to view the interactive dashboard!**

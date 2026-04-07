@@ -26,7 +26,7 @@ Commands (from repository root):
 - Export and generate timeline
   node ./scripts/export-data.js
   node ./scripts/generate-timeline.js
-  # or run all: cd scripts && npm run process
+  # or run both from scripts/: npm run export && npm run timeline
 
 What you get
 - data/all-entries.json — parsed daily entries

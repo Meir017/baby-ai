@@ -93,7 +93,7 @@ cd scripts
 npm run timeline
 
 # Or generate everything at once
-npm run process
+npm run export && npm run timeline
 
 # Then open: ../data/timeline.html in your browser
 ```

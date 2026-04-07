@@ -47,7 +47,7 @@ in your web browser
 ### Generate Everything:
 ```bash
 cd scripts
-npm run process
+npm run export && npm run timeline
 ```
 This runs: parse → export → timeline in sequence
 
@@ -127,7 +127,7 @@ From your 164 days of tracked data:
 | `export-data.js` | `npm run export` | Export to CSV/HTML/MD |
 | **`generate-timeline.js`** | **`npm run timeline`** | **Generate interactive dashboard** ⭐ |
 
-Run all: `npm run process`
+Run both: `npm run export && npm run timeline`
 
 ## 📁 Complete File Structure
 
